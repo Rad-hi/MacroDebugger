@@ -1,7 +1,7 @@
 #ifndef __MACRO_DEBUGGER_H__
 #define __MACRO_DEBUGGER_H__
   
-  #ifdef ENABLE_DEBUG
+  #ifdef ENABLE_DEBUG // Nothing is even included incase we don't want debug-printing
 
     #include "Arduino.h"
 
@@ -23,18 +23,64 @@
       #define DEBUG_SERIAL_PORT           Serial
     #endif
 
-    #ifndef DEBUG_RX_PIN
-      #define DEBUG_RX_PIN                SER_0_PIN_RX
-    #endif
-
-    #ifndef DEBUG_TX_PIN
-      #define DEBUG_TX_PIN                SER_0_PIN_TX
-    #endif
+/* Architecture dependent macros */
     
-    #define DEBUG_BEGIN()                 DEBUG_SERIAL_PORT.begin(DEBUG_SER_BAUD_RATE, SERIAL_8N1, DEBUG_RX_PIN, DEBUG_TX_PIN)
-    #define DEBUG(X...)                   DEBUG_SERIAL_PORT.printf(X)
-    #define DEBUGLN(X...)                 ( {DEBUG_SERIAL_PORT.printf(X), DEBUG_SERIAL_PORT.println();} )
+    #if defined(ARDUINO_ARCH_ESP32) or defined(ARDUINO_ARCH_ESP8266)
 
+      // Define the Serial pins (multiplexed on the ESPs
+      #ifndef DEBUG_RX_PIN
+        #define DEBUG_RX_PIN              SER_0_PIN_RX
+      #endif
+  
+      #ifndef DEBUG_TX_PIN
+        #define DEBUG_TX_PIN              SER_0_PIN_TX
+      #endif
+      
+      #define DEBUG_BEGIN()               DEBUG_SERIAL_PORT.begin(DEBUG_SER_BAUD_RATE, SERIAL_8N1, DEBUG_RX_PIN, DEBUG_TX_PIN)
+      #define DEBUG(X...)                 DEBUG_SERIAL_PORT.printf(X)
+      #define DEBUGLN(X...)               ( {DEBUG_SERIAL_PORT.printf(X), DEBUG_SERIAL_PORT.println();} )
+    
+    #else // Arduino side
+    
+      // Ref: https://playground.arduino.cc/Main/Printf/
+
+      // Unfortunately, we need to allocate memroy beforehands for this
+      #ifndef PRINT_BUFFER_SIZE
+        #define PRINT_BUFFER_SIZE           128
+      #endif
+      
+      #include <stdarg.h>
+      
+      void p(char *fmt, ...){
+        char buf[PRINT_BUFFER_SIZE];
+        va_list args;
+        va_start (args, fmt );
+        vsnprintf(buf, PRINT_BUFFER_SIZE, fmt, args);
+        va_end (args);
+        DEBUG_SERIAL_PORT.print(buf);
+      }
+
+      // Taking advantage of the fact that the Arduino IDE uses a C++ compiler --> Polymorphism
+      void p(const __FlashStringHelper *fmt, ... ){
+        char buf[PRINT_BUFFER_SIZE];
+        va_list args;
+        va_start (args, fmt);
+      #ifdef __AVR__
+        vsnprintf_P(buf, sizeof(buf), (const char *)fmt, args); // progmem for AVR
+      #else
+        vsnprintf(buf, sizeof(buf), (const char *)fmt, args); // for the rest of the world
+      #endif
+        va_end(args);
+        DEBUG_SERIAL_PORT.print(buf);
+      }
+
+
+      #define DEBUG_BEGIN()               DEBUG_SERIAL_PORT.begin(DEBUG_SER_BAUD_RATE)
+      #define DEBUG(X...)                 p(X)
+      #define DEBUGLN(X...)               ( {p(X), DEBUG_SERIAL_PORT.println();} )
+      
+    #endif
+        
     #define DEBUG_E(X...)                 ( {DEBUG("%-10s-- ", "[ERROR]"),   DEBUGLN(X);} )
     #define DEBUG_W(X...)                 ( {DEBUG("%-10s-- ", "[WARNING]"), DEBUGLN(X);} )
     #define DEBUG_I(X...)                 ( {DEBUG("%-10s-- ", "[INFO]"),    DEBUGLN(X);} )
@@ -69,7 +115,7 @@
 
     #define DEBUG_ENDL()                  // Nothing
     
-    #define DEBUG_AVAILABLE()             (-1)
+    #define DEBUG_AVAILABLE()             0
     #define DEBUG_READ()                  0
     
     #define DEBUG_FILL_UNTIL(B, C)        // Nothing
