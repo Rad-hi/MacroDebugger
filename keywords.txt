@@ -1,0 +1,40 @@
+#####################################
+# Syntax Coloring for MacroDebugger # 
+#    (ESP8266, ESP32, Arduino)      #
+#####################################
+
+########################
+# Datatypes (KEYWORD1) #
+########################
+
+ENABLE_DEBUG			KEYWORD1
+DEBUG_RX_PIN            KEYWORD1
+DEBUG_TX_PIN            KEYWORD1
+DEBUG_SER_BAUD_RATE     KEYWORD1
+
+####################################
+# Methods and Functions (KEYWORD2) #
+####################################
+
+DEBUG_BEGIN				KEYWORD2
+DEBUG					KEYWORD2
+DEBUGLN					KEYWORD2
+DEBUG_E					KEYWORD2
+DEBUG_W					KEYWORD2
+DEBUG_I					KEYWORD2
+DEBUG_ENDL				KEYWORD2
+DEBUG_AVAILABLE			KEYWORD2
+DEBUG_READ				KEYWORD2
+DEBUG_FILL_UNTIL		KEYWORD2
+DEBUG_FLUSH				KEYWORD2
+
+########################
+# Constants (LITERAL1) #
+########################
+
+SER_0_PIN_RX    		LITERAL1
+SER_0_PIN_TX    		LITERAL1
+SER_1_PIN_RX    		LITERAL1
+SER_1_PIN_TX    		LITERAL1
+SER_2_PIN_RX    		LITERAL1
+SER_2_PIN_TX    		LITERAL1

@@ -1,3 +1,29 @@
+/* 
+ * -----------------------------------------------------------------------------
+ * Library: MacroDebugger
+ * This is a MACRO-based debug-printing library.
+ * The special thing about it is that since it's MACRO-based, this allows us
+ * to remove all printing statements through the change of a single line of code
+ * (or to be more specific, the commenting of a line).
+ * -----------------------------------------------------------------------------
+ * It allows for:
+ *    - Printing formatted strings (C style)
+ *    - Serial read/write, and even filling a buffer with serial data until a 
+ * 		a provided character
+ *    - Change of the Serial port used (tested on an ESP32 with Serial2 & Putty)
+ * All this could be present in your codebase, and you don't have to get back
+ * and delete it all (delete this Serial.println, and this one, ...), been there!
+ * YOU JUST COMMENT ONE LINE!
+ * -----------------------------------------------------------------------------
+ * Author: Radhi SGHAIER: https://github.com/Rad-hi
+ * -----------------------------------------------------------------------------
+ * Date: 07-09-2022 (7th of September, 2022)
+ * -----------------------------------------------------------------------------
+ * License: Do whatever you want with the code ...
+ *          If this was ever useful to you, and we happened to meet on 
+ *          the street, I'll appreciate a cup of dark coffee, no sugar please.
+ * -----------------------------------------------------------------------------
+ */
 #ifndef __MACRO_DEBUGGER_H__
 #define __MACRO_DEBUGGER_H__
   
